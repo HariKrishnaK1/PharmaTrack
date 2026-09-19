@@ -14,13 +14,37 @@ import {
   Bell,
   Mail,
   AlertTriangle,
+  Send,
+  Loader2
 } from 'lucide-react';
+import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useToast } from '../context/ToastContext';
 
 export const Settings = () => {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { theme, resolvedTheme, setTheme } = useTheme();
+  const toast = useToast();
+  const [sendingTest, setSendingTest] = React.useState(false);
+
+  const handleSendTestEmail = async () => {
+    setSendingTest(true);
+    try {
+      const token = localStorage.getItem('pharmatrack_token');
+      const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const res = await axios.post(
+        `${apiBase}/alerts/test-email`,
+        { recipient: user?.email },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success(res.data?.message || 'Test alert email sent!');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to send test email. Check server credentials.');
+    } finally {
+      setSendingTest(false);
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -209,17 +233,33 @@ export const Settings = () => {
         {/* Setup instructions */}
         <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
           <p className="text-xs font-semibold text-amber-900 mb-2 flex items-center gap-1.5">
-            <Key className="w-3.5 h-3.5" /> Gmail App Password Setup (One-time)
+            <Key className="w-3.5 h-3.5" /> Gmail App Password Setup
           </p>
           <ol className="text-[11px] text-amber-800 space-y-1 list-decimal list-inside leading-relaxed">
-            <li>Go to <strong>Google Account → Security → 2-Step Verification</strong></li>
-            <li>Scroll down to <strong>App Passwords</strong> and create one for "Mail"</li>
-            <li>Copy the 16-character password (no spaces)</li>
-            <li>Set <code className="bg-amber-100 px-1 rounded font-mono">EMAIL_USER</code> and <code className="bg-amber-100 px-1 rounded font-mono">EMAIL_PASS</code> in <code className="bg-amber-100 px-1 rounded font-mono">server/.env</code></li>
-            <li>Set <code className="bg-amber-100 px-1 rounded font-mono">ADMIN_EMAILS</code> to comma-separated recipient addresses</li>
-            <li>Restart the server — emails will fire automatically on new alerts</li>
+            <li>Configure <code className="bg-amber-100 px-1 rounded font-mono">EMAIL_USER</code> and <code className="bg-amber-100 px-1 rounded font-mono">EMAIL_PASS</code> in <code className="bg-amber-100 px-1 rounded font-mono">server/.env</code></li>
+            <li>Set <code className="bg-amber-100 px-1 rounded font-mono">ADMIN_EMAILS</code> to target alert recipient addresses</li>
+            <li>Use the button below to test your SMTP configuration immediately</li>
           </ol>
         </div>
+
+        {/* Live Test Dispatch Button */}
+        {isAdmin && (
+          <div className="pt-2 flex items-center justify-between border-t border-slate-100">
+            <div>
+              <span className="text-xs font-semibold text-slate-800 block">Verify Outbound Email Delivery</span>
+              <span className="text-[11px] text-slate-500 block">Sends a test alert to {user?.email}</span>
+            </div>
+            <button
+              type="button"
+              onClick={handleSendTestEmail}
+              disabled={sendingTest}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-semibold shadow-sm transition disabled:opacity-50"
+            >
+              {sendingTest ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+              {sendingTest ? 'Sending Test Email...' : 'Send Test Alert Email'}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

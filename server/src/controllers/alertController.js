@@ -101,3 +101,21 @@ export const evaluateAlertsHandler = async (req, res, next) => {
     next(err);
   }
 };
+
+export const sendTestAlertEmailHandler = async (req, res, next) => {
+  try {
+    const { sendTestEmail } = await import('../services/emailService.js');
+    const recipient = req.body?.recipient || req.user?.email;
+    const result = await sendTestEmail(recipient);
+    res.status(200).json({
+      success: true,
+      message: `Test notification email successfully dispatched to ${recipient}`,
+      messageId: result?.messageId
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message || 'Failed to dispatch test notification email'
+    });
+  }
+};
