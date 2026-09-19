@@ -245,7 +245,7 @@ export const Batches = () => {
                   return (
                     <tr key={b._id} className="hover:bg-slate-50/80 transition">
                       <td className="py-3 px-4 font-mono font-bold text-slate-900">
-                        <Link to={`/batches/${b._id}`} className="hover:text-teal-600">
+                        <Link to={`/app/batches/${b._id}`} className="hover:text-teal-600">
                           {b.batchNumber}
                         </Link>
                       </td>

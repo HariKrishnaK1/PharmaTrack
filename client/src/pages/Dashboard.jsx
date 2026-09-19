@@ -90,7 +90,7 @@ export const Dashboard = () => {
             Refresh Data
           </button>
           <Link
-            to="/shipments/new"
+            to="/app/shipments/new"
             className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-teal-600 rounded-lg hover:bg-teal-700 transition shadow-sm shadow-teal-600/20"
           >
             <Truck className="w-3.5 h-3.5" />
@@ -159,7 +159,7 @@ export const Dashboard = () => {
               </h2>
             </div>
             <Link
-              to="/alerts"
+              to="/app/alerts"
               className="text-xs font-semibold text-teal-600 hover:text-teal-700 flex items-center gap-1"
             >
               All Alerts <ArrowRight className="w-3.5 h-3.5" />
@@ -190,7 +190,7 @@ export const Dashboard = () => {
                     Resolve
                   </button>
                   <button
-                    onClick={() => navigate('/alerts')}
+                    onClick={() => navigate('/app/alerts')}
                     className="px-2.5 py-1 text-xs font-medium text-slate-600 hover:text-slate-900 bg-slate-100 rounded-lg transition"
                   >
                     Details
@@ -210,7 +210,7 @@ export const Dashboard = () => {
               <h3 className="text-sm font-bold text-slate-900">Inventory Distribution by Warehouse Hub</h3>
               <p className="text-xs text-slate-500">Real-time stored units against maximum regional storage capacity</p>
             </div>
-            <Link to="/warehouses" className="text-xs font-semibold text-teal-600 hover:text-teal-700 flex items-center gap-1">
+            <Link to="/app/warehouses" className="text-xs font-semibold text-teal-600 hover:text-teal-700 flex items-center gap-1">
               Warehouses <ExternalLink className="w-3 h-3" />
             </Link>
           </div>
@@ -223,7 +223,7 @@ export const Dashboard = () => {
               <h3 className="text-sm font-bold text-slate-900">7-Day Inventory Movement Velocity</h3>
               <p className="text-xs text-slate-500">Inbound batch intakes vs outbound consignment dispatches</p>
             </div>
-            <Link to="/movements" className="text-xs font-semibold text-teal-600 hover:text-teal-700 flex items-center gap-1">
+            <Link to="/app/movements" className="text-xs font-semibold text-teal-600 hover:text-teal-700 flex items-center gap-1">
               Movements <ExternalLink className="w-3 h-3" />
             </Link>
           </div>

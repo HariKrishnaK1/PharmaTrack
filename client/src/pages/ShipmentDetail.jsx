@@ -75,7 +75,7 @@ export const ShipmentDetail = () => {
     return (
       <div className="text-center py-12">
         <p className="text-sm text-slate-500">Consignment record not found.</p>
-        <Link to="/shipments" className="text-xs text-teal-600 font-semibold mt-2 inline-block">Return to Shipments</Link>
+        <Link to="/app/shipments" className="text-xs text-teal-600 font-semibold mt-2 inline-block">Return to Shipments</Link>
       </div>
     );
   }
@@ -86,7 +86,7 @@ export const ShipmentDetail = () => {
   return (
     <div className="space-y-6">
       <Link
-        to="/shipments"
+        to="/app/shipments"
         className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition"
       >
         <ArrowLeft className="w-4 h-4" /> Back to Consignments List

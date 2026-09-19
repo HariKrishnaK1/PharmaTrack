@@ -32,24 +32,24 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobile
   };
 
   const navItems = [
-    { label: 'Dashboard', path: '/', icon: LayoutDashboard },
-    { label: 'Products', path: '/products', icon: Pill },
-    { label: 'Inventory', path: '/inventory', icon: Layers },
-    { label: 'Batches & Expiry', path: '/batches', icon: CalendarClock },
-    { label: 'Warehouses', path: '/warehouses', icon: Building2 },
-    { label: 'Shipments', path: '/shipments', icon: Truck },
-    { label: 'Stock Movements', path: '/movements', icon: ArrowLeftRight },
+    { label: 'Dashboard', path: '/app', icon: LayoutDashboard },
+    { label: 'Products', path: '/app/products', icon: Pill },
+    { label: 'Inventory', path: '/app/inventory', icon: Layers },
+    { label: 'Batches & Expiry', path: '/app/batches', icon: CalendarClock },
+    { label: 'Warehouses', path: '/app/warehouses', icon: Building2 },
+    { label: 'Shipments', path: '/app/shipments', icon: Truck },
+    { label: 'Stock Movements', path: '/app/movements', icon: ArrowLeftRight },
     {
       label: 'Alerts',
-      path: '/alerts',
+      path: '/app/alerts',
       icon: AlertTriangle,
       badge: unreadCount > 0 ? unreadCount : null,
       badgeColor: criticalCount > 0 ? 'bg-rose-600' : 'bg-amber-600'
     },
-    { label: 'Analytics', path: '/analytics', icon: BarChart3 },
-    ...(isAdmin ? [{ label: 'Audit Logs', path: '/audit-logs', icon: History }] : []),
-    ...(isAdmin ? [{ label: 'Users', path: '/users', icon: Users }] : []),
-    { label: 'Settings', path: '/settings', icon: Settings },
+    { label: 'Analytics', path: '/app/analytics', icon: BarChart3 },
+    ...(isAdmin ? [{ label: 'Audit Logs', path: '/app/audit-logs', icon: History }] : []),
+    ...(isAdmin ? [{ label: 'Users', path: '/app/users', icon: Users }] : []),
+    { label: 'Settings', path: '/app/settings', icon: Settings },
   ];
 
   return (

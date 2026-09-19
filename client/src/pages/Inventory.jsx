@@ -79,7 +79,7 @@ export const Inventory = () => {
         </div>
 
         <Link
-          to="/movements"
+          to="/app/movements"
           className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-teal-600 rounded-lg hover:bg-teal-700 transition shadow-sm shadow-teal-600/20 self-start sm:self-auto"
         >
           <ArrowLeftRight className="w-4 h-4" /> Record Movement
@@ -156,13 +156,13 @@ export const Inventory = () => {
                   return (
                     <tr key={item._id} className="hover:bg-slate-50/80 transition">
                       <td className="py-3 px-4">
-                        <Link to={`/products/${item.product?._id}`} className="font-semibold text-slate-900 hover:text-teal-600">
+                        <Link to={`/app/products/${item.product?._id}`} className="font-semibold text-slate-900 hover:text-teal-600">
                           {item.product?.name}
                         </Link>
                         <div className="text-[10px] text-slate-400 font-mono">{item.product?.productCode} • {item.product?.category}</div>
                       </td>
                       <td className="py-3 px-3 font-mono font-semibold text-slate-800">
-                        <Link to={`/batches/${item.batch?._id}`} className="hover:text-amber-600">
+                        <Link to={`/app/batches/${item.batch?._id}`} className="hover:text-amber-600">
                           {item.batch?.batchNumber}
                         </Link>
                       </td>

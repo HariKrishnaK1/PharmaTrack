@@ -140,7 +140,7 @@ export const Warehouses = () => {
                   Manager: <span className="font-semibold text-slate-700">{wh.manager?.name || 'Assigned Lead'}</span>
                 </span>
                 <Link
-                  to={`/warehouses/${wh._id}`}
+                  to={`/app/warehouses/${wh._id}`}
                   className="inline-flex items-center gap-1 text-xs font-semibold text-teal-600 hover:text-teal-700"
                 >
                   View Facility <ArrowRight className="w-3.5 h-3.5" />

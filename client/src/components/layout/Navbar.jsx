@@ -143,7 +143,7 @@ export const Navbar = ({ isCollapsed, onToggleMobile, onOpenSearch, onOpenAI }) 
                   )}
                 </div>
                 <Link
-                  to="/alerts"
+                  to="/app/alerts"
                   onClick={() => setShowAlertMenu(false)}
                   className="text-xs font-medium text-teal-600 hover:text-teal-700 flex items-center gap-1"
                 >
@@ -162,7 +162,7 @@ export const Navbar = ({ isCollapsed, onToggleMobile, onOpenSearch, onOpenAI }) 
                       key={alert._id}
                       onClick={() => {
                         markRead(alert._id);
-                        navigate('/alerts');
+                        navigate('/app/alerts');
                         setShowAlertMenu(false);
                       }}
                       className="p-3.5 hover:bg-slate-50 transition cursor-pointer flex items-start gap-3"

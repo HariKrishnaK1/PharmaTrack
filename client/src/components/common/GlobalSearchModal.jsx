@@ -104,7 +104,7 @@ export const GlobalSearchModal = ({ isOpen, onClose }) => {
                     {results.products.map(p => (
                       <div
                         key={p._id}
-                        onClick={() => handleSelect(`/products/${p._id}`)}
+                        onClick={() => handleSelect(`/app/products/${p._id}`)}
                         className="p-2 rounded-lg hover:bg-slate-100 cursor-pointer flex items-center justify-between text-xs group"
                       >
                         <div>
@@ -128,7 +128,7 @@ export const GlobalSearchModal = ({ isOpen, onClose }) => {
                     {results.batches.map(b => (
                       <div
                         key={b._id}
-                        onClick={() => handleSelect(`/batches/${b._id}`)}
+                        onClick={() => handleSelect(`/app/batches/${b._id}`)}
                         className="p-2 rounded-lg hover:bg-slate-100 cursor-pointer flex items-center justify-between text-xs group"
                       >
                         <div>
@@ -152,7 +152,7 @@ export const GlobalSearchModal = ({ isOpen, onClose }) => {
                     {results.warehouses.map(w => (
                       <div
                         key={w._id}
-                        onClick={() => handleSelect(`/warehouses/${w._id}`)}
+                        onClick={() => handleSelect(`/app/warehouses/${w._id}`)}
                         className="p-2 rounded-lg hover:bg-slate-100 cursor-pointer flex items-center justify-between text-xs group"
                       >
                         <div>
@@ -176,7 +176,7 @@ export const GlobalSearchModal = ({ isOpen, onClose }) => {
                     {results.shipments.map(s => (
                       <div
                         key={s._id}
-                        onClick={() => handleSelect(`/shipments/${s._id}`)}
+                        onClick={() => handleSelect(`/app/shipments/${s._id}`)}
                         className="p-2 rounded-lg hover:bg-slate-100 cursor-pointer flex items-center justify-between text-xs group"
                       >
                         <div>

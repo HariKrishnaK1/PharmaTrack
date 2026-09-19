@@ -27,7 +27,7 @@ export const Login = () => {
     try {
       await login(email, password);
       toast.success('Authenticated successfully. Welcome back to PharmaTrack.');
-      navigate('/');
+      navigate('/app');
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid email or password credentials.');
     } finally {
@@ -41,7 +41,7 @@ export const Login = () => {
     try {
       await demoLogin(role);
       toast.success(`Logged in with demo role: ${role}`);
-      navigate('/');
+      navigate('/app');
     } catch (err) {
       setError(err.response?.data?.message || 'Demo authentication failed.');
     } finally {

@@ -58,7 +58,7 @@ export const BatchDetail = () => {
     return (
       <div className="text-center py-12">
         <p className="text-sm text-slate-500">Batch not found.</p>
-        <Link to="/batches" className="text-xs text-teal-600 font-semibold mt-2 inline-block">Return to Batches</Link>
+        <Link to="/app/batches" className="text-xs text-teal-600 font-semibold mt-2 inline-block">Return to Batches</Link>
       </div>
     );
   }
@@ -69,7 +69,7 @@ export const BatchDetail = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <Link
-        to="/batches"
+        to="/app/batches"
         className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition"
       >
         <ArrowLeft className="w-4 h-4" /> Back to Batches Ledger
@@ -87,7 +87,7 @@ export const BatchDetail = () => {
                 <Badge status={batch.expiryStatus} />
               </div>
               <p className="text-xs text-slate-500 mt-1">
-                Formulation: <Link to={`/products/${batch.product?._id}`} className="font-semibold text-teal-600 hover:underline">{batch.product?.name}</Link> [{batch.product?.productCode}]
+                Formulation: <Link to={`/app/products/${batch.product?._id}`} className="font-semibold text-teal-600 hover:underline">{batch.product?.name}</Link> [{batch.product?.productCode}]
               </p>
             </div>
           </div>

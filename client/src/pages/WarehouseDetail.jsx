@@ -36,7 +36,7 @@ export const WarehouseDetail = () => {
     return (
       <div className="text-center py-12">
         <p className="text-sm text-slate-500">Warehouse facility not found.</p>
-        <Link to="/warehouses" className="text-xs text-teal-600 font-semibold mt-2 inline-block">Return to Warehouses</Link>
+        <Link to="/app/warehouses" className="text-xs text-teal-600 font-semibold mt-2 inline-block">Return to Warehouses</Link>
       </div>
     );
   }
@@ -47,7 +47,7 @@ export const WarehouseDetail = () => {
   return (
     <div className="space-y-6">
       <Link
-        to="/warehouses"
+        to="/app/warehouses"
         className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition"
       >
         <ArrowLeft className="w-4 h-4" /> Back to Warehouses Hubs
@@ -140,13 +140,13 @@ export const WarehouseDetail = () => {
               {inventories.map((inv) => (
                 <tr key={inv._id} className="hover:bg-slate-50">
                   <td className="py-3 px-4">
-                    <Link to={`/products/${inv.product?._id}`} className="font-semibold text-slate-900 hover:text-teal-600">
+                    <Link to={`/app/products/${inv.product?._id}`} className="font-semibold text-slate-900 hover:text-teal-600">
                       {inv.product?.name}
                     </Link>
                     <div className="text-[10px] text-slate-400 font-mono">{inv.product?.productCode}</div>
                   </td>
                   <td className="py-3 px-3 font-mono font-semibold text-slate-700">
-                    <Link to={`/batches/${inv.batch?._id}`} className="hover:text-amber-600">
+                    <Link to={`/app/batches/${inv.batch?._id}`} className="hover:text-amber-600">
                       {inv.batch?.batchNumber}
                     </Link>
                   </td>

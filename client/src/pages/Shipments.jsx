@@ -59,7 +59,7 @@ export const Shipments = () => {
 
         {canCreateShipments && (
           <Link
-            to="/shipments/new"
+            to="/app/shipments/new"
             className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-teal-600 rounded-lg hover:bg-teal-700 transition shadow-sm shadow-teal-600/20 self-start sm:self-auto"
           >
             <Plus className="w-4 h-4" /> Create Consignment
@@ -133,7 +133,7 @@ export const Shipments = () => {
                   return (
                     <tr key={s._id} className="hover:bg-slate-50/80 transition">
                       <td className="py-3 px-4 font-mono font-bold text-slate-900">
-                        <Link to={`/shipments/${s._id}`} className="hover:text-teal-600">
+                        <Link to={`/app/shipments/${s._id}`} className="hover:text-teal-600">
                           {s.shipmentId}
                         </Link>
                       </td>
@@ -159,7 +159,7 @@ export const Shipments = () => {
                       </td>
                       <td className="py-3 px-4 text-center">
                         <Link
-                          to={`/shipments/${s._id}`}
+                          to={`/app/shipments/${s._id}`}
                           className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-teal-700 bg-teal-50 hover:bg-teal-100 rounded-lg transition"
                         >
                           <Eye className="w-3.5 h-3.5" /> Details

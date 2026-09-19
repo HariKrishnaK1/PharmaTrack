@@ -94,7 +94,7 @@ export const Products = () => {
 
         {canManageProducts && (
           <Link
-            to="/products/new"
+            to="/app/products/new"
             className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-teal-600 rounded-lg hover:bg-teal-700 transition shadow-sm shadow-teal-600/20 self-start sm:self-auto"
           >
             <Plus className="w-4 h-4" /> Add Formulation
@@ -179,7 +179,7 @@ export const Products = () => {
                 products.map((p) => (
                   <tr key={p._id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="py-3 px-4">
-                      <Link to={`/products/${p._id}`} className="font-semibold text-slate-900 hover:text-teal-600">
+                      <Link to={`/app/products/${p._id}`} className="font-semibold text-slate-900 hover:text-teal-600">
                         {p.name}
                       </Link>
                       <div className="text-[11px] text-slate-500 mt-0.5">{p.genericName} • {p.strength}</div>
@@ -207,7 +207,7 @@ export const Products = () => {
                     <td className="py-3 px-4 text-center">
                       <div className="flex items-center justify-center gap-1.5">
                         <Link
-                          to={`/products/${p._id}`}
+                          to={`/app/products/${p._id}`}
                           className="p-1.5 rounded-lg text-slate-500 hover:text-teal-600 hover:bg-teal-50 transition"
                           title="View Product"
                         >
@@ -215,7 +215,7 @@ export const Products = () => {
                         </Link>
                         {canManageProducts && (
                           <Link
-                            to={`/products/${p._id}/edit`}
+                            to={`/app/products/${p._id}/edit`}
                             className="p-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition"
                             title="Edit Product"
                           >

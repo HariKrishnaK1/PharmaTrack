@@ -49,7 +49,7 @@ export const ProductDetail = () => {
     return (
       <div className="text-center py-12">
         <p className="text-sm text-slate-500">Product not found.</p>
-        <Link to="/products" className="text-xs text-teal-600 font-semibold mt-2 inline-block">
+        <Link to="/app/products" className="text-xs text-teal-600 font-semibold mt-2 inline-block">
           Return to Catalog
         </Link>
       </div>
@@ -63,7 +63,7 @@ export const ProductDetail = () => {
       {/* Top Breadcrumb & Navigation */}
       <div className="flex items-center justify-between">
         <Link
-          to="/products"
+          to="/app/products"
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Products Catalog
@@ -71,7 +71,7 @@ export const ProductDetail = () => {
 
         {canManageProducts && (
           <Link
-            to={`/products/${product._id}/edit`}
+            to={`/app/products/${product._id}/edit`}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-teal-600 hover:bg-teal-700 rounded-lg transition"
           >
             <Edit2 className="w-3.5 h-3.5" /> Edit Product
@@ -188,7 +188,7 @@ export const ProductDetail = () => {
               Associated Production Batches ({batches.length})
             </h2>
           </div>
-          <Link to="/batches" className="text-xs text-teal-600 font-semibold hover:text-teal-700">
+          <Link to="/app/batches" className="text-xs text-teal-600 font-semibold hover:text-teal-700">
             View All Batches →
           </Link>
         </div>
@@ -209,7 +209,7 @@ export const ProductDetail = () => {
               {batches.map((b) => (
                 <tr key={b._id} className="hover:bg-slate-50">
                   <td className="py-3 px-4 font-mono font-semibold text-slate-900">
-                    <Link to={`/batches/${b._id}`} className="hover:text-teal-600">
+                    <Link to={`/app/batches/${b._id}`} className="hover:text-teal-600">
                       {b.batchNumber}
                     </Link>
                   </td>
