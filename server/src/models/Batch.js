@@ -49,7 +49,15 @@ const batchSchema = new mongoose.Schema({
     enum: ['RELEASED', 'QUARANTINE', 'RECALLED'],
     default: 'RELEASED',
     index: true
-  }
+  },
+  documents: [{
+    name: { type: String, required: true },
+    url: { type: String, required: true },
+    fileType: { type: String, default: 'PDF' },
+    size: { type: Number, default: 0 },
+    uploadedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    uploadedAt: { type: Date, default: Date.now },
+  }]
 }, {
   timestamps: true,
   toJSON: { virtuals: true },

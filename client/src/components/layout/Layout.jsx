@@ -4,6 +4,7 @@ import { Sidebar } from './Sidebar';
 import { Navbar } from './Navbar';
 import { GlobalSearchModal } from '../common/GlobalSearchModal';
 import { AIAssistantDrawer } from '../ai/AIAssistantDrawer';
+import { ErrorBoundary } from '../common/ErrorBoundary';
 
 export const Layout = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -40,7 +41,9 @@ export const Layout = () => {
 
         {/* Dynamic Page Content */}
         <main className="flex-1 p-4 md:p-6 lg:p-8 max-w-7xl w-full mx-auto animate-in fade-in-50 duration-200">
-          <Outlet />
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
         </main>
       </div>
 

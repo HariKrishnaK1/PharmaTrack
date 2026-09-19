@@ -11,6 +11,7 @@ import auditRoutes from './auditRoutes.js';
 import userRoutes from './userRoutes.js';
 import aiRoutes from './aiRoutes.js';
 import searchRoutes from './searchRoutes.js';
+import documentRoutes from './documentRoutes.js';
 
 const router = express.Router();
 
@@ -26,5 +27,6 @@ router.use('/audit-logs', auditRoutes);
 router.use('/users', userRoutes);
 router.use('/ai', aiRoutes);
 router.use('/search', searchRoutes);
+router.use('/documents', documentRoutes);
 
 export default router;

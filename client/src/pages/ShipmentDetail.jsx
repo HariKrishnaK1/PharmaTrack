@@ -19,6 +19,7 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { Badge } from '../components/common/Badge';
 import { ShipmentTimeline } from '../components/shipments/ShipmentTimeline';
+import { DocumentUploader } from '../components/common/DocumentUploader';
 
 export const ShipmentDetail = () => {
   const { id } = useParams();
@@ -28,7 +29,7 @@ export const ShipmentDetail = () => {
   const [statusNote, setStatusNote] = useState('');
   const [updating, setUpdating] = useState(false);
 
-  const { canUpdateStock } = useAuth();
+  const { canUpdateStock, canCreateShipments } = useAuth();
   const toast = useToast();
 
   const fetchShipment = async () => {
@@ -273,6 +274,25 @@ export const ShipmentDetail = () => {
           </div>
         </div>
       )}
+
+      {/* Document Attachments Panel */}
+      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs mt-6">
+        <DocumentUploader
+          entityType="shipment"
+          entityId={id}
+          documents={shipment?.documents || []}
+          canDelete={canCreateShipments}
+          onUpdate={(newDoc, deletedId) => {
+            setShipment(prev => {
+              const docs = prev.documents || [];
+              if (deletedId) {
+                return { ...prev, documents: docs.filter(d => d._id !== deletedId) };
+              }
+              return { ...prev, documents: [...docs, newDoc] };
+            });
+          }}
+        />
+      </div>
     </div>
   );
 };

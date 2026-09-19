@@ -5,6 +5,7 @@ import { batchService } from '../services/batchService';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { Badge } from '../components/common/Badge';
+import { DocumentUploader } from '../components/common/DocumentUploader';
 
 export const BatchDetail = () => {
   const { id } = useParams();
@@ -153,6 +154,25 @@ export const BatchDetail = () => {
             </div>
           </div>
         )}
+
+        {/* Document Attachments */}
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs">
+          <DocumentUploader
+            entityType="batch"
+            entityId={id}
+            documents={data?.batch?.documents || []}
+            canDelete={canManageProducts}
+            onUpdate={(newDoc, deletedId) => {
+              setData(prev => {
+                const docs = prev.batch.documents || [];
+                if (deletedId) {
+                  return { ...prev, batch: { ...prev.batch, documents: docs.filter(d => d._id !== deletedId) } };
+                }
+                return { ...prev, batch: { ...prev.batch, documents: [...docs, newDoc] } };
+              });
+            }}
+          />
+        </div>
       </div>
     </div>
   );

@@ -134,28 +134,28 @@ export const Shipments = () => {
                     <tr key={s._id} className="hover:bg-slate-50/80 transition">
                       <td className="py-3 px-4 font-mono font-bold text-slate-900">
                         <Link to={`/app/shipments/${s._id}`} className="hover:text-teal-600">
-                          {s.shipmentId}
+                          {s.shipmentId || 'N/A'}
                         </Link>
                       </td>
                       <td className="py-3 px-3 text-slate-700">
-                        {s.sourceWarehouse?.name}
+                        {s.sourceWarehouse?.name || 'Unassigned Hub'}
                       </td>
                       <td className="py-3 px-3">
-                        <span className="font-semibold text-slate-900">{s.destination?.facilityName}</span>
-                        <div className="text-[10px] text-slate-500">{s.destination?.city}</div>
+                        <span className="font-semibold text-slate-900">{s.destination?.facilityName || 'Direct Delivery'}</span>
+                        <div className="text-[10px] text-slate-500">{s.destination?.city || '-'}</div>
                       </td>
                       <td className="py-3 px-3 text-slate-700 font-medium">
-                        {s.carrier}
+                        {s.carrier || 'Internal Fleet'}
                       </td>
                       <td className="py-3 px-3">
                         <span className="font-mono font-semibold text-slate-800">{totalUnits.toLocaleString()} units</span>
                         <div className="text-[10px] text-slate-400">({s.items?.length || 0} product lines)</div>
                       </td>
                       <td className="py-3 px-3 text-slate-600">
-                        {new Date(s.expectedDeliveryDate).toLocaleDateString()}
+                        {s.expectedDeliveryDate ? new Date(s.expectedDeliveryDate).toLocaleDateString() : 'TBD'}
                       </td>
                       <td className="py-3 px-3 text-center">
-                        <Badge status={s.status} />
+                        <Badge status={s.status || 'PENDING'} />
                       </td>
                       <td className="py-3 px-4 text-center">
                         <Link

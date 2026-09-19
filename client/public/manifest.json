@@ -1,0 +1,18 @@
+{
+  "name": "PharmaTrack - Pharma Inventory & Supply Chain",
+  "short_name": "PharmaTrack",
+  "description": "Pharmaceutical Supply Chain & Inventory Operations Platform",
+  "start_url": "/app",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0d9488",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/pwa-icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

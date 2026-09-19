@@ -13,7 +13,8 @@ import {
   CheckCircle2,
   XCircle,
   HelpCircle,
-  ArrowRight
+  ArrowRight,
+  Camera
 } from 'lucide-react';
 import { batchService } from '../services/batchService';
 import { productService } from '../services/productService';
@@ -21,6 +22,7 @@ import { warehouseService } from '../services/warehouseService';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { Badge } from '../components/common/Badge';
+import { BarcodeScannerModal } from '../components/common/BarcodeScannerModal';
 
 export const Batches = () => {
   const [batches, setBatches] = useState([]);
@@ -33,6 +35,7 @@ export const Batches = () => {
 
   // Create Batch Modal
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
   const [products, setProducts] = useState([]);
   const [warehouses, setWarehouses] = useState([]);
   const [submitting, setSubmitting] = useState(false);
@@ -442,15 +445,35 @@ export const Batches = () => {
 
             <form onSubmit={handleCreateSubmit} className="mt-4 space-y-3 text-xs">
               <div>
-                <label className="block font-semibold text-slate-700 uppercase tracking-wider mb-1">Batch Number *</label>
-                <input
-                  type="text"
-                  required
-                  value={createForm.batchNumber}
-                  onChange={(e) => setCreateForm(p => ({ ...p, batchNumber: e.target.value.toUpperCase() }))}
-                  placeholder="e.g. PCM-2026-901"
-                  className="w-full px-3 py-2 font-mono bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-teal-600"
-                />
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block font-semibold text-slate-700 uppercase tracking-wider">Batch Number *</label>
+                  <button
+                    type="button"
+                    onClick={() => setShowScanner(true)}
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-teal-600 hover:text-teal-700 dark:text-teal-400"
+                  >
+                    <Camera className="w-3.5 h-3.5" />
+                    Scan Barcode
+                  </button>
+                </div>
+                <div className="relative flex items-center">
+                  <input
+                    type="text"
+                    required
+                    value={createForm.batchNumber}
+                    onChange={(e) => setCreateForm(p => ({ ...p, batchNumber: e.target.value.toUpperCase() }))}
+                    placeholder="e.g. PCM-2026-901"
+                    className="w-full pl-3 pr-10 py-2 font-mono bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-teal-600"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowScanner(true)}
+                    title="Open Camera Scanner"
+                    className="absolute right-2 p-1 text-slate-400 hover:text-teal-600 transition"
+                  >
+                    <Camera className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
 
               <div>
@@ -545,6 +568,17 @@ export const Batches = () => {
           </div>
         </div>
       )}
+
+      {/* Barcode Scanner Modal */}
+      <BarcodeScannerModal
+        isOpen={showScanner}
+        onClose={() => setShowScanner(false)}
+        title="Scan Batch Barcode / QR Code"
+        onScan={(code) => {
+          setCreateForm(p => ({ ...p, batchNumber: code.toUpperCase() }));
+          toast.success(`Scanned batch: ${code}`);
+        }}
+      />
     </div>
   );
 };

@@ -10,7 +10,8 @@ import {
   ArrowDownLeft,
   ArrowUpRight,
   Sliders,
-  AlertCircle
+  AlertCircle,
+  Camera
 } from 'lucide-react';
 import { inventoryService } from '../services/inventoryService';
 import { productService } from '../services/productService';
@@ -18,6 +19,7 @@ import { batchService } from '../services/batchService';
 import { warehouseService } from '../services/warehouseService';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { BarcodeScannerModal } from '../components/common/BarcodeScannerModal';
 
 export const StockMovements = () => {
   const [movements, setMovements] = useState([]);
@@ -28,6 +30,7 @@ export const StockMovements = () => {
 
   // Modal State
   const [showModal, setShowModal] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [products, setProducts] = useState([]);
   const [batches, setBatches] = useState([]);
@@ -337,22 +340,42 @@ export const StockMovements = () => {
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Batch Number *
-                </label>
-                <select
-                  required
-                  value={form.batchId}
-                  onChange={(e) => setForm(prev => ({ ...prev, batchId: e.target.value }))}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-teal-600 font-mono"
-                >
-                  <option value="">Select an active batch...</option>
-                  {batches.map(b => (
-                    <option key={b._id} value={b._id}>
-                      {b.batchNumber} (Expires: {new Date(b.expiryDate).toLocaleDateString()}) - {b.currentQuantity} units
-                    </option>
-                  ))}
-                </select>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block font-semibold text-slate-700 uppercase tracking-wider">
+                    Batch Number *
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowScanner(true)}
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-teal-600 hover:text-teal-700 dark:text-teal-400"
+                  >
+                    <Camera className="w-3.5 h-3.5" />
+                    Scan Barcode
+                  </button>
+                </div>
+                <div className="relative flex items-center">
+                  <select
+                    required
+                    value={form.batchId}
+                    onChange={(e) => setForm(prev => ({ ...prev, batchId: e.target.value }))}
+                    className="w-full pl-3 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-teal-600 font-mono"
+                  >
+                    <option value="">Select an active batch...</option>
+                    {batches.map(b => (
+                      <option key={b._id} value={b._id}>
+                        {b.batchNumber} (Expires: {new Date(b.expiryDate).toLocaleDateString()}) - {b.currentQuantity} units
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => setShowScanner(true)}
+                    title="Scan Batch Barcode"
+                    className="absolute right-2 p-1 text-slate-400 hover:text-teal-600 transition"
+                  >
+                    <Camera className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -457,6 +480,40 @@ export const StockMovements = () => {
           </div>
         </div>
       )}
+
+      {/* Barcode Scanner Modal */}
+      <BarcodeScannerModal
+        isOpen={showScanner}
+        onClose={() => setShowScanner(false)}
+        title="Scan Batch Code for Stock Intake / Dispatch"
+        onScan={async (code) => {
+          const matched = batches.find(b => b.batchNumber?.toUpperCase() === code.toUpperCase());
+          if (matched) {
+            setForm(prev => ({ ...prev, batchId: matched._id }));
+            toast.success(`Matched active batch: ${matched.batchNumber}`);
+          } else {
+            // Attempt to search all batches for this code
+            try {
+              const res = await batchService.getBatches({ search: code });
+              if (res.data && res.data.length > 0) {
+                const found = res.data[0];
+                setForm(prev => ({
+                  ...prev,
+                  productId: found.product?._id || found.product,
+                  batchId: found._id
+                }));
+                // Update batches list
+                setBatches([found]);
+                toast.success(`Loaded batch: ${found.batchNumber} (${found.product?.name || 'Product'})`);
+              } else {
+                toast.error(`No batch found matching barcode "${code}"`);
+              }
+            } catch (err) {
+              toast.error(`Barcode parsed: ${code}, but not found in inventory`);
+            }
+          }
+        }}
+      />
     </div>
   );
 };
