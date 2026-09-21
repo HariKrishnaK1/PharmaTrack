@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Navbar } from './Navbar';
 import { GlobalSearchModal } from '../common/GlobalSearchModal';
 import { AIAssistantDrawer } from '../ai/AIAssistantDrawer';
 import { ErrorBoundary } from '../common/ErrorBoundary';
+import { useAuth } from '../../context/AuthContext';
+import { ShieldAlert, LogIn } from 'lucide-react';
 
 export const Layout = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -12,7 +14,14 @@ export const Layout = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAIOpen, setIsAIOpen] = useState(false);
 
+  const { isDemo, user, logout } = useAuth();
+  const navigate = useNavigate();
   const location = useLocation();
+
+  const handleSignInRedirect = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#090d16] text-slate-900 dark:text-slate-100 flex transition-colors duration-150">
@@ -31,6 +40,27 @@ export const Layout = () => {
           ${isCollapsed ? 'lg:pl-20' : 'lg:pl-64'}
         `}
       >
+        {/* Top Sticky Demo Warning Banner */}
+        {isDemo && (
+          <div className="bg-amber-500/15 border-b border-amber-500/30 px-4 py-2 text-xs text-amber-900 dark:text-amber-200 flex flex-wrap items-center justify-between gap-2 z-40">
+            <div className="flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0" />
+              <span className="font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-600 text-white text-[10px]">
+                Demo Sandbox ({user?.name || 'demoAdmin'})
+              </span>
+              <span className="font-medium text-[11px] sm:text-xs">
+                You are viewing PharmaTrack with simulated demonstration data. Database modification is disabled.
+              </span>
+            </div>
+            <button
+              onClick={handleSignInRedirect}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition shadow-xs"
+            >
+              <LogIn className="w-3.5 h-3.5" /> Sign in with real account
+            </button>
+          </div>
+        )}
+
         {/* Top Navbar */}
         <Navbar
           isCollapsed={isCollapsed}

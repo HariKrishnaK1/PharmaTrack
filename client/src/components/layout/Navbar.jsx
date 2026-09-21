@@ -20,7 +20,7 @@ import { useAlerts } from '../../context/AlertContext';
 import { useTheme } from '../../context/ThemeContext';
 
 export const Navbar = ({ isCollapsed, onToggleMobile, onOpenSearch, onOpenAI }) => {
-  const { user, logout, demoLogin } = useAuth();
+  const { user, logout, demoLogin, isDemo } = useAuth();
   const { alerts, unreadCount, criticalCount, markRead } = useAlerts();
   const { isDark, toggleTheme } = useTheme();
   const [showRoleMenu, setShowRoleMenu] = useState(false);
@@ -39,13 +39,25 @@ export const Navbar = ({ isCollapsed, onToggleMobile, onOpenSearch, onOpenAI }) 
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleRoleSwitch = async (role) => {
+  const handleRoleSwitch = (role) => {
     setShowRoleMenu(false);
-    await demoLogin(role);
+    demoLogin(role);
     window.location.reload();
   };
 
-  const getRoleBadge = (role) => {
+  const getRoleBadge = (role, demo) => {
+    if (demo) {
+      switch (role) {
+        case 'ADMIN':
+          return { label: 'demoAdmin (Demo)', bg: 'bg-purple-50 text-purple-700 border-purple-200' };
+        case 'INVENTORY_MANAGER':
+          return { label: 'demoInventory (Demo)', bg: 'bg-blue-50 text-blue-700 border-blue-200' };
+        case 'WAREHOUSE_MANAGER':
+          return { label: 'demoWarehouse (Demo)', bg: 'bg-teal-50 text-teal-700 border-teal-200' };
+        default:
+          return { label: `${role} (Demo)`, bg: 'bg-slate-50 text-slate-700 border-slate-200' };
+      }
+    }
     switch (role) {
       case 'ADMIN':
         return { label: 'System Admin', bg: 'bg-purple-50 text-purple-700 border-purple-200' };
@@ -58,7 +70,7 @@ export const Navbar = ({ isCollapsed, onToggleMobile, onOpenSearch, onOpenAI }) 
     }
   };
 
-  const roleBadge = getRoleBadge(user?.role);
+  const roleBadge = getRoleBadge(user?.role, isDemo);
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between h-16 px-4 md:px-6 bg-white border-b border-slate-200/80 shadow-xs">
@@ -235,8 +247,11 @@ export const Navbar = ({ isCollapsed, onToggleMobile, onOpenSearch, onOpenAI }) 
         </div>
 
         {/* User initials icon */}
-        <div className="w-8 h-8 rounded-full bg-teal-800 text-white flex items-center justify-center text-xs font-bold shadow-2xs">
-          {user?.name?.charAt(0) || 'U'}
+        <div
+          title={user?.name ? `${user.name} (${user?.role})` : 'User'}
+          className="w-8 h-8 rounded-full bg-teal-800 text-white flex items-center justify-center text-xs font-bold shadow-2xs cursor-default"
+        >
+          {user?.name ? user.name.slice(0, 2).toUpperCase() : 'U'}
         </div>
       </div>
     </header>

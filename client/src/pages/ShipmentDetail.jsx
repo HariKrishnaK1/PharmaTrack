@@ -29,7 +29,7 @@ export const ShipmentDetail = () => {
   const [statusNote, setStatusNote] = useState('');
   const [updating, setUpdating] = useState(false);
 
-  const { canUpdateStock, canCreateShipments } = useAuth();
+  const { canUpdateStock, canCreateShipments, isDemo } = useAuth();
   const toast = useToast();
 
   const fetchShipment = async () => {
@@ -50,6 +50,11 @@ export const ShipmentDetail = () => {
 
   const handleUpdateStatus = async () => {
     if (!statusModal) return;
+    if (isDemo) {
+      toast.error('Action Disabled: Consignment status modifications are disabled in Demo Mode.');
+      setStatusModal(null);
+      return;
+    }
     setUpdating(true);
     try {
       await shipmentService.updateStatus(id, statusModal, statusNote);

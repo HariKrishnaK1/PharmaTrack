@@ -22,7 +22,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useAlerts } from '../../context/AlertContext';
 
 export const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen, onOpenAI }) => {
-  const { user, logout, isAdmin } = useAuth();
+  const { user, logout, isAdmin, isDemo } = useAuth();
   const { unreadCount, criticalCount } = useAlerts();
   const navigate = useNavigate();
 
@@ -152,11 +152,13 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobile
             {!isCollapsed && (
               <div className="flex items-center gap-2.5 overflow-hidden">
                 <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-semibold text-slate-200 shrink-0">
-                  {user?.name?.charAt(0) || 'U'}
+                  {user?.name ? user.name.slice(0, 2).toUpperCase() : 'U'}
                 </div>
                 <div className="flex flex-col truncate">
                   <span className="text-xs font-semibold text-white truncate">{user?.name}</span>
-                  <span className="text-[10px] text-teal-400 font-mono tracking-tight">{user?.role}</span>
+                  <span className={`text-[10px] font-mono tracking-tight ${isDemo ? 'text-amber-400 font-bold' : 'text-teal-400'}`}>
+                    {isDemo ? 'DEMO MODE (VIEW ONLY)' : user?.role}
+                  </span>
                 </div>
               </div>
             )}

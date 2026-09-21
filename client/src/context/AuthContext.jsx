@@ -13,6 +13,16 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const initAuth = async () => {
+      const isDemo = localStorage.getItem('pharmatrack_is_demo') === 'true';
+      if (isDemo) {
+        const saved = localStorage.getItem('pharmatrack_user');
+        if (saved) {
+          setUser(JSON.parse(saved));
+        }
+        setLoading(false);
+        return;
+      }
+
       if (token) {
         try {
           const data = await authService.getMe();
@@ -29,6 +39,7 @@ export const AuthProvider = ({ children }) => {
   }, [token]);
 
   const login = async (email, password) => {
+    localStorage.removeItem('pharmatrack_is_demo');
     const data = await authService.login(email, password);
     setToken(data.token);
     setUser(data.user);
@@ -37,17 +48,33 @@ export const AuthProvider = ({ children }) => {
     return data.user;
   };
 
-  const demoLogin = async (role) => {
-    let email = 'admin@pharmatrack.com';
-    let password = 'Admin@123';
+  const demoLogin = (role) => {
+    let name = 'demoAdmin';
+    let email = 'demoadmin@pharmatrack.com';
     if (role === 'INVENTORY_MANAGER') {
-      email = 'inventory@pharmatrack.com';
-      password = 'Inventory@123';
+      name = 'demoInventory';
+      email = 'demoinventory@pharmatrack.com';
     } else if (role === 'WAREHOUSE_MANAGER') {
-      email = 'warehouse@pharmatrack.com';
-      password = 'Warehouse@123';
+      name = 'demoWarehouse';
+      email = 'demowarehouse@pharmatrack.com';
     }
-    return login(email, password);
+
+    const demoUser = {
+      _id: 'demo_' + role.toLowerCase(),
+      name,
+      email,
+      role,
+      isDemo: true,
+      createdAt: new Date().toISOString()
+    };
+
+    const demoToken = 'demo_token_' + role.toLowerCase();
+    setUser(demoUser);
+    setToken(demoToken);
+    localStorage.setItem('pharmatrack_is_demo', 'true');
+    localStorage.setItem('pharmatrack_token', demoToken);
+    localStorage.setItem('pharmatrack_user', JSON.stringify(demoUser));
+    return demoUser;
   };
 
   const logout = () => {
@@ -55,24 +82,28 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem('pharmatrack_token');
     localStorage.removeItem('pharmatrack_user');
+    localStorage.removeItem('pharmatrack_is_demo');
   };
 
+  const isDemo = Boolean(user?.isDemo || localStorage.getItem('pharmatrack_is_demo') === 'true');
   const isAdmin = user?.role === 'ADMIN';
   const isInventoryManager = user?.role === 'INVENTORY_MANAGER';
   const isWarehouseManager = user?.role === 'WAREHOUSE_MANAGER';
 
+  // Demo users have UI view permissions to open and explore creation workflows in read-only mode
   const canManageUsers = isAdmin;
-  const canManageProducts = isAdmin || isInventoryManager;
-  const canManageWarehouses = isAdmin;
-  const canCreateShipments = isAdmin || isInventoryManager;
-  const canUpdateStock = isAdmin || isInventoryManager || isWarehouseManager;
+  const canManageProducts = isDemo || isAdmin || isInventoryManager;
+  const canManageWarehouses = isDemo || isAdmin;
+  const canCreateShipments = isDemo || isAdmin || isInventoryManager;
+  const canUpdateStock = isDemo || isAdmin || isInventoryManager || isWarehouseManager;
 
   return (
     <AuthContext.Provider value={{
       user,
       token,
       loading,
-      isAuthenticated: !!token && !!user,
+      isAuthenticated: (!!token && !!user) || isDemo,
+      isDemo,
       login,
       demoLogin,
       logout,

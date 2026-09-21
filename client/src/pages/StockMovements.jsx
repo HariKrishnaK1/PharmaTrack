@@ -11,7 +11,10 @@ import {
   ArrowUpRight,
   Sliders,
   AlertCircle,
-  Camera
+  Camera,
+  Lock,
+  LogIn,
+  AlertTriangle
 } from 'lucide-react';
 import { inventoryService } from '../services/inventoryService';
 import { productService } from '../services/productService';
@@ -19,6 +22,7 @@ import { batchService } from '../services/batchService';
 import { warehouseService } from '../services/warehouseService';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { useNavigate } from 'react-router-dom';
 import { BarcodeScannerModal } from '../components/common/BarcodeScannerModal';
 
 export const StockMovements = () => {
@@ -47,8 +51,9 @@ export const StockMovements = () => {
     notes: ''
   });
 
-  const { canUpdateStock } = useAuth();
+  const { canUpdateStock, isDemo, logout } = useAuth();
   const toast = useToast();
+  const navigate = useNavigate();
 
   const fetchMovements = async () => {
     try {
@@ -72,13 +77,31 @@ export const StockMovements = () => {
   }, [page, movementType]);
 
   const openMovementModal = async () => {
+    if (isDemo) {
+      toast.warning('Demo Mode: Movement form is view-only. Entering details and database changes are disabled. Please log in with an authorized account.');
+    }
     try {
       const [pRes, wRes] = await Promise.all([
         productService.getProducts({ limit: 100 }),
         warehouseService.getWarehouses()
       ]);
-      setProducts(pRes.data || []);
-      setWarehouses(wRes.data || []);
+      const prodList = pRes.data || [];
+      const whList = wRes.data || [];
+      setProducts(prodList);
+      setWarehouses(whList);
+
+      if (isDemo) {
+        setForm({
+          movementType: 'TRANSFER',
+          productId: prodList[0]?._id || 'prod_demo_1',
+          batchId: 'batch_demo_1',
+          sourceWarehouseId: whList[0]?._id || 'wh_demo_1',
+          destinationWarehouseId: whList[3]?._id || 'wh_demo_4',
+          quantity: 500,
+          referenceNumber: 'TRF-DEMO-2026',
+          notes: 'Simulated inter-hub stock balancing transfer between Mumbai Hub and Bengaluru Depo.'
+        });
+      }
       setShowModal(true);
     } catch (err) {
       toast.error('Failed to initialize movement modal options.');
@@ -86,6 +109,7 @@ export const StockMovements = () => {
   };
 
   const handleProductChange = async (productId) => {
+    if (isDemo) return;
     setForm(prev => ({ ...prev, productId, batchId: '' }));
     if (!productId) {
       setBatches([]);
@@ -104,6 +128,11 @@ export const StockMovements = () => {
 
   const handleSubmitMovement = async (e) => {
     e.preventDefault();
+    if (isDemo) {
+      toast.error('Action Disabled: You must log in with an authorized account to record stock movements.');
+      return;
+    }
+
     setSubmitting(true);
     try {
       await inventoryService.recordMovement(form);
@@ -299,6 +328,19 @@ export const StockMovements = () => {
               </button>
             </div>
 
+            {/* Demo Banner */}
+            {isDemo && (
+              <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-start gap-2 text-xs text-amber-900 dark:text-amber-200">
+                <Lock className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-bold">Demo Mode: View-Only Modal.</span>
+                  <p className="text-[11px] text-amber-800 dark:text-amber-300">
+                    Fields are disabled. Please sign in with an authorized account to record real stock movements.
+                  </p>
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleSubmitMovement} className="mt-5 space-y-4 text-xs">
               <div>
                 <label className="block font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
@@ -309,12 +351,13 @@ export const StockMovements = () => {
                     <button
                       key={t}
                       type="button"
+                      disabled={isDemo}
                       onClick={() => setForm(prev => ({ ...prev, movementType: t }))}
                       className={`py-2 rounded-lg font-bold border transition text-center ${
                         form.movementType === t
                           ? 'bg-teal-600 text-white border-teal-600 shadow-xs'
                           : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-                      }`}
+                      } ${isDemo ? 'cursor-not-allowed opacity-90' : ''}`}
                     >
                       {t}
                     </button>
@@ -328,9 +371,12 @@ export const StockMovements = () => {
                 </label>
                 <select
                   required
+                  disabled={isDemo}
                   value={form.productId}
                   onChange={(e) => handleProductChange(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-teal-600"
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none ${
+                    isDemo ? 'bg-slate-100 text-slate-600 border-slate-200 cursor-not-allowed' : 'bg-slate-50 border-slate-200 focus:border-teal-600'
+                  }`}
                 >
                   <option value="">Select a pharmaceutical formulation...</option>
                   {products.map(p => (
@@ -356,9 +402,12 @@ export const StockMovements = () => {
                 <div className="relative flex items-center">
                   <select
                     required
+                    disabled={isDemo}
                     value={form.batchId}
                     onChange={(e) => setForm(prev => ({ ...prev, batchId: e.target.value }))}
-                    className="w-full pl-3 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-teal-600 font-mono"
+                    className={`w-full pl-3 pr-10 py-2 border rounded-lg focus:outline-none font-mono ${
+                      isDemo ? 'bg-slate-100 text-slate-600 border-slate-200 cursor-not-allowed' : 'bg-slate-50 border-slate-200 focus:border-teal-600'
+                    }`}
                   >
                     <option value="">Select an active batch...</option>
                     {batches.map(b => (
@@ -369,9 +418,10 @@ export const StockMovements = () => {
                   </select>
                   <button
                     type="button"
+                    disabled={isDemo}
                     onClick={() => setShowScanner(true)}
                     title="Scan Batch Barcode"
-                    className="absolute right-2 p-1 text-slate-400 hover:text-teal-600 transition"
+                    className="absolute right-2 p-1 text-slate-400 hover:text-teal-600 disabled:opacity-40 transition"
                   >
                     <Camera className="w-4 h-4" />
                   </button>
@@ -386,9 +436,12 @@ export const StockMovements = () => {
                     </label>
                     <select
                       required
+                      disabled={isDemo}
                       value={form.sourceWarehouseId}
                       onChange={(e) => setForm(prev => ({ ...prev, sourceWarehouseId: e.target.value }))}
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-teal-600"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none ${
+                        isDemo ? 'bg-slate-100 text-slate-600 border-slate-200 cursor-not-allowed' : 'bg-slate-50 border-slate-200 focus:border-teal-600'
+                      }`}
                     >
                       <option value="">Select source warehouse...</option>
                       {warehouses.map(w => (
@@ -405,9 +458,12 @@ export const StockMovements = () => {
                     </label>
                     <select
                       required
+                      disabled={isDemo}
                       value={form.destinationWarehouseId}
                       onChange={(e) => setForm(prev => ({ ...prev, destinationWarehouseId: e.target.value }))}
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-teal-600"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none ${
+                        isDemo ? 'bg-slate-100 text-slate-600 border-slate-200 cursor-not-allowed' : 'bg-slate-50 border-slate-200 focus:border-teal-600'
+                      }`}
                     >
                       <option value="">Select destination warehouse...</option>
                       {warehouses.map(w => (
@@ -426,10 +482,13 @@ export const StockMovements = () => {
                   <input
                     type="number"
                     required
+                    disabled={isDemo}
                     min="1"
                     value={form.quantity}
                     onChange={(e) => setForm(prev => ({ ...prev, quantity: Number(e.target.value) }))}
-                    className="w-full px-3 py-2 font-mono bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-teal-600"
+                    className={`w-full px-3 py-2 font-mono border rounded-lg focus:outline-none ${
+                      isDemo ? 'bg-slate-100 text-slate-600 border-slate-200 cursor-not-allowed' : 'bg-slate-50 border-slate-200 focus:border-teal-600'
+                    }`}
                   />
                 </div>
 
@@ -439,10 +498,13 @@ export const StockMovements = () => {
                   </label>
                   <input
                     type="text"
+                    disabled={isDemo}
                     value={form.referenceNumber}
                     onChange={(e) => setForm(prev => ({ ...prev, referenceNumber: e.target.value.toUpperCase() }))}
                     placeholder="e.g. MOV-PO-99214"
-                    className="w-full px-3 py-2 font-mono bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-teal-600"
+                    className={`w-full px-3 py-2 font-mono border rounded-lg focus:outline-none ${
+                      isDemo ? 'bg-slate-100 text-slate-600 border-slate-200 cursor-not-allowed' : 'bg-slate-50 border-slate-200 focus:border-teal-600'
+                    }`}
                   />
                 </div>
               </div>
@@ -453,10 +515,13 @@ export const StockMovements = () => {
                 </label>
                 <textarea
                   rows={2}
+                  disabled={isDemo}
                   value={form.notes}
                   onChange={(e) => setForm(prev => ({ ...prev, notes: e.target.value }))}
                   placeholder="Carrier tracking, inspection checklist confirmation, etc."
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-teal-600"
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none ${
+                    isDemo ? 'bg-slate-100 text-slate-600 border-slate-200 cursor-not-allowed' : 'bg-slate-50 border-slate-200 focus:border-teal-600'
+                  }`}
                 />
               </div>
 
@@ -470,10 +535,22 @@ export const StockMovements = () => {
                 </button>
                 <button
                   type="submit"
-                  disabled={submitting}
-                  className="px-4 py-2 font-semibold text-white bg-teal-600 hover:bg-teal-700 rounded-lg transition shadow-sm shadow-teal-600/20 disabled:opacity-50"
+                  disabled={isDemo || submitting}
+                  className={`flex items-center gap-1.5 px-4 py-2 font-semibold rounded-lg transition shadow-sm ${
+                    isDemo
+                      ? 'bg-slate-200 text-slate-500 cursor-not-allowed border border-slate-300'
+                      : 'bg-teal-600 hover:bg-teal-700 text-white shadow-teal-600/20'
+                  }`}
                 >
-                  {submitting ? 'Verifying & Recording...' : 'Execute Stock Movement'}
+                  {isDemo ? (
+                    <>
+                      <Lock className="w-3.5 h-3.5" /> Log In Required
+                    </>
+                  ) : submitting ? (
+                    'Verifying & Recording...'
+                  ) : (
+                    'Execute Stock Movement'
+                  )}
                 </button>
               </div>
             </form>

@@ -29,7 +29,7 @@ export const Products = () => {
   const [deleteModalItem, setDeleteModalItem] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
-  const { canManageProducts, isAdmin } = useAuth();
+  const { canManageProducts, isAdmin, isDemo } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -66,6 +66,11 @@ export const Products = () => {
 
   const handleDelete = async () => {
     if (!deleteModalItem) return;
+    if (isDemo) {
+      toast.error('Action Disabled: Product deletions are disabled in Demo Mode.');
+      setDeleteModalItem(null);
+      return;
+    }
     setDeleting(true);
     try {
       const res = await productService.deleteProduct(deleteModalItem._id);

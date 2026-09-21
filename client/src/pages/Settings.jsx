@@ -23,12 +23,16 @@ import { useTheme } from '../context/ThemeContext';
 import { useToast } from '../context/ToastContext';
 
 export const Settings = () => {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, isDemo } = useAuth();
   const { theme, resolvedTheme, setTheme } = useTheme();
   const toast = useToast();
   const [sendingTest, setSendingTest] = React.useState(false);
 
   const handleSendTestEmail = async () => {
+    if (isDemo) {
+      toast.warning('Demo Mode: Live test email delivery is simulated. Real email dispatched in production only.');
+      return;
+    }
     setSendingTest(true);
     try {
       const token = localStorage.getItem('pharmatrack_token');
@@ -61,14 +65,16 @@ export const Settings = () => {
       <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-4">
         <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
           <div className="w-12 h-12 rounded-full bg-teal-800 text-white flex items-center justify-center font-bold text-base">
-            {user?.name?.charAt(0) || 'U'}
+            {user?.name ? user.name.slice(0, 2).toUpperCase() : 'U'}
           </div>
           <div>
             <h2 className="text-base font-bold text-slate-900">{user?.name}</h2>
             <p className="text-xs text-slate-500">{user?.email}</p>
           </div>
-          <span className="ml-auto px-2.5 py-1 rounded-md text-xs font-bold bg-teal-50 text-teal-700 border border-teal-200">
-            {user?.role}
+          <span className={`ml-auto px-2.5 py-1 rounded-md text-xs font-bold border ${
+            isDemo ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-teal-50 text-teal-700 border-teal-200'
+          }`}>
+            {isDemo ? `${user?.role} (DEMO)` : user?.role}
           </span>
         </div>
 
@@ -79,8 +85,8 @@ export const Settings = () => {
           </div>
           <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
             <span className="text-slate-400 block font-medium">Session Status</span>
-            <span className="font-semibold text-emerald-700 mt-0.5 block flex items-center gap-1">
-              <CheckCircle className="w-3.5 h-3.5" /> Authenticated JWT
+            <span className={`font-semibold mt-0.5 block flex items-center gap-1 ${isDemo ? 'text-amber-700' : 'text-emerald-700'}`}>
+              <CheckCircle className="w-3.5 h-3.5" /> {isDemo ? 'Simulated Demo Sandbox' : 'Authenticated JWT'}
             </span>
           </div>
           <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
