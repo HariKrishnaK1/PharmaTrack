@@ -6,7 +6,7 @@ import { GlobalSearchModal } from '../common/GlobalSearchModal';
 import { AIAssistantDrawer } from '../ai/AIAssistantDrawer';
 import { ErrorBoundary } from '../common/ErrorBoundary';
 import { useAuth } from '../../context/AuthContext';
-import { ShieldAlert, LogIn } from 'lucide-react';
+import { ShieldAlert, LogIn, UserCheck } from 'lucide-react';
 
 export const Layout = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -14,13 +14,18 @@ export const Layout = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAIOpen, setIsAIOpen] = useState(false);
 
-  const { isDemo, user, logout } = useAuth();
+  const { isDemo, user, logout, hasRealAccount, realUser, restoreRealAccount } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   const handleSignInRedirect = () => {
     logout();
     navigate('/login');
+  };
+
+  const handleReturnToReal = () => {
+    restoreRealAccount();
+    window.location.reload();
   };
 
   return (
@@ -49,15 +54,26 @@ export const Layout = () => {
                 Demo Sandbox ({user?.name || 'demoAdmin'})
               </span>
               <span className="font-medium text-[11px] sm:text-xs">
-                You are viewing PharmaTrack with simulated demonstration data. Database modification is disabled.
+                {hasRealAccount
+                  ? `Simulating ${user?.role} perspective with mock data. Real database is protected.`
+                  : 'You are viewing PharmaTrack with simulated demonstration data. Database modification is disabled.'}
               </span>
             </div>
-            <button
-              onClick={handleSignInRedirect}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition shadow-xs"
-            >
-              <LogIn className="w-3.5 h-3.5" /> Sign in with real account
-            </button>
+            {hasRealAccount ? (
+              <button
+                onClick={handleReturnToReal}
+                className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition shadow-xs"
+              >
+                <UserCheck className="w-3.5 h-3.5" /> Return to My Account ({realUser?.name})
+              </button>
+            ) : (
+              <button
+                onClick={handleSignInRedirect}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition shadow-xs"
+              >
+                <LogIn className="w-3.5 h-3.5" /> Sign in with real account
+              </button>
+            )}
           </div>
         )}
 

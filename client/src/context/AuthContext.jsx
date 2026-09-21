@@ -28,6 +28,9 @@ export const AuthProvider = ({ children }) => {
           const data = await authService.getMe();
           setUser(data.user);
           localStorage.setItem('pharmatrack_user', JSON.stringify(data.user));
+          // Store real authenticated session for quick return if simulating demo roles
+          localStorage.setItem('pharmatrack_real_user', JSON.stringify(data.user));
+          localStorage.setItem('pharmatrack_real_token', token);
         } catch (err) {
           console.warn('Session check failed:', err.message);
           logout();
@@ -45,10 +48,47 @@ export const AuthProvider = ({ children }) => {
     setUser(data.user);
     localStorage.setItem('pharmatrack_token', data.token);
     localStorage.setItem('pharmatrack_user', JSON.stringify(data.user));
+    // Save real authenticated session
+    localStorage.setItem('pharmatrack_real_token', data.token);
+    localStorage.setItem('pharmatrack_real_user', JSON.stringify(data.user));
     return data.user;
   };
 
+  const restoreRealAccount = () => {
+    const realToken = localStorage.getItem('pharmatrack_real_token');
+    const realUserStr = localStorage.getItem('pharmatrack_real_user');
+    if (realToken && realUserStr) {
+      try {
+        const realUser = JSON.parse(realUserStr);
+        setUser(realUser);
+        setToken(realToken);
+        localStorage.removeItem('pharmatrack_is_demo');
+        localStorage.setItem('pharmatrack_token', realToken);
+        localStorage.setItem('pharmatrack_user', realUserStr);
+        return realUser;
+      } catch (err) {
+        console.error('Failed to parse real user session:', err);
+      }
+    }
+    return null;
+  };
+
   const demoLogin = (role) => {
+    // Check if the user is already authenticated with a real account matching this role
+    const realUserStr = localStorage.getItem('pharmatrack_real_user');
+    const realToken = localStorage.getItem('pharmatrack_real_token');
+    if (realUserStr && realToken) {
+      try {
+        const realUser = JSON.parse(realUserStr);
+        // If selecting their own real role, restore the real account instead of demo!
+        if (realUser.role === role) {
+          return restoreRealAccount();
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
     let name = 'demoAdmin';
     let email = 'demoadmin@pharmatrack.com';
     if (role === 'INVENTORY_MANAGER') {
@@ -83,9 +123,15 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('pharmatrack_token');
     localStorage.removeItem('pharmatrack_user');
     localStorage.removeItem('pharmatrack_is_demo');
+    localStorage.removeItem('pharmatrack_real_token');
+    localStorage.removeItem('pharmatrack_real_user');
   };
 
   const isDemo = Boolean(user?.isDemo || localStorage.getItem('pharmatrack_is_demo') === 'true');
+  const realUserStr = localStorage.getItem('pharmatrack_real_user');
+  const realUser = realUserStr ? JSON.parse(realUserStr) : null;
+  const hasRealAccount = Boolean(localStorage.getItem('pharmatrack_real_token') && realUser);
+
   const isAdmin = user?.role === 'ADMIN';
   const isInventoryManager = user?.role === 'INVENTORY_MANAGER';
   const isWarehouseManager = user?.role === 'WAREHOUSE_MANAGER';
@@ -104,6 +150,9 @@ export const AuthProvider = ({ children }) => {
       loading,
       isAuthenticated: (!!token && !!user) || isDemo,
       isDemo,
+      hasRealAccount,
+      realUser,
+      restoreRealAccount,
       login,
       demoLogin,
       logout,
